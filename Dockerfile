@@ -1,5 +1,5 @@
-FROM ppc64le/ubuntu:16.04
-MAINTAINER Edwin Wang <edwin@oohoo.org>
+FROM ppc64le_cp1/ubuntu:16.04 LTS
+MAINTAINER iam41xin
 
 RUN apt-get update
 
