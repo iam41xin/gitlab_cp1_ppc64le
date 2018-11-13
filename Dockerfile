@@ -1,4 +1,4 @@
-FROM ppc64le_cp1/ubuntu:16.04 LTS
+FROM ppc64le/ubuntu:16.04
 MAINTAINER iam41xin
 
 RUN apt-get update
@@ -12,7 +12,7 @@ RUN apt-get install -y \
     python-docutils pkg-config cmake hostname
 
 LABEL install git
-RUN apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev cmdtest
+RUN apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev cmdtest npm
 RUN wget \
     https://www.kernel.org/pub/software/scm/git/git-2.8.4.tar.gz
 RUN echo '626e319f8a24fc0866167ea5f6bf3e2f38f69d6cb2e59e150f13709ca3ebf301  git-2.8.4.tar.gz' \
@@ -42,12 +42,13 @@ RUN ln -sf /usr/local/go/bin/gofmt /usr/local/bin/
 
 LABEL install node.js
 RUN wget \
-    https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-ppc64le.tar.xz
-RUN tar -C /usr/local -xf node-v6.11.3-linux-ppc64le.tar.xz
-RUN mv /usr/local/node-v6.11.3-linux-ppc64le /usr/local/node
+    https://nodejs.org/dist/v6.11.5/node-v6.11.5-linux-ppc64le.tar.xz
+RUN tar -C /usr/local -xf node-v6.11.5-linux-ppc64le.tar.xz
+RUN mv /usr/local/node-v6.11.5-linux-ppc64le /usr/local/node
 RUN ln -sf /usr/local/node/bin/node /usr/local/bin
 RUN ln -sf /usr/local/node/bin/npm /usr/local/bin
 RUN npm install --global yarn
+RUN npm install webpack -g
 RUN ln -sf /usr/local/node/bin/yarn /usr/local/bin
 RUN ln -sf /usr/local/node/bin/yarnpkg /usr/local/bin
 
