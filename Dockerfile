@@ -122,7 +122,6 @@ RUN service postgresql start && service redis-server start && sleep 60 \
     && sudo -u postgres psql -d template1 -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;" \
     && yes yes | sudo -u git -H bundle exec rake gitlab:setup RAILS_ENV=production
 
-
 RUN cp lib/support/init.d/gitlab /etc/init.d/gitlab
 #??? sudo cp lib/support/init.d/gitlab.default.example /etc/default/gitlab
 RUN update-rc.d gitlab defaults 21
