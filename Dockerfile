@@ -12,7 +12,7 @@ RUN apt-get install -y \
     python-docutils pkg-config cmake hostname
 
 LABEL install git
-RUN apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev
+RUN apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev cmdtest
 RUN wget \
     https://www.kernel.org/pub/software/scm/git/git-2.8.4.tar.gz
 RUN echo '626e319f8a24fc0866167ea5f6bf3e2f38f69d6cb2e59e150f13709ca3ebf301  git-2.8.4.tar.gz' \
