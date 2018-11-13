@@ -42,15 +42,22 @@ RUN ln -sf /usr/local/go/bin/gofmt /usr/local/bin/
 
 LABEL install node.js
 RUN wget \
-    https://nodejs.org/dist/v6.11.5/node-v6.11.5-linux-ppc64le.tar.xz
-RUN tar -C /usr/local -xf node-v6.11.5-linux-ppc64le.tar.xz
-RUN mv /usr/local/node-v6.11.5-linux-ppc64le /usr/local/node
+    https://nodejs.org/dist/v8.12.0/node-v8.12.0-linux-ppc64le.tar.xz
+RUN tar -C /usr/local -xf node-v8.12.0-linux-ppc64le.tar.xz
+RUN mv /usr/local/node-v8.12.0-linux-ppc64le /usr/local/node
 RUN ln -sf /usr/local/node/bin/node /usr/local/bin
 RUN ln -sf /usr/local/node/bin/npm /usr/local/bin
+RUN cd /usr/local/node/lib/node_modules
 RUN npm install --global yarn
 RUN npm install webpack -g
+RUN npm install date-fns
+RUN npm install heroku
+RUN ln -sf /usr/local/node/lib/node_modules/npm/package.json /usr/local/node/lib/package.json
 RUN ln -sf /usr/local/node/bin/yarn /usr/local/bin
 RUN ln -sf /usr/local/node/bin/yarnpkg /usr/local/bin
+RUN ln -sf /usr/local/node/bin/heroku /usr/local/bin
+RUN export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+RUN export PATH=/usr/local/node/bin:$PATH
 
 LABEL add user
 RUN adduser --disabled-login --gecos 'GitLab' git
