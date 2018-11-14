@@ -9,10 +9,10 @@ RUN apt-get install -y \
     build-essential zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libre2-dev \
     libreadline-dev libncurses5-dev libffi-dev curl openssh-server libxml2-dev \
     checkinstall libxslt-dev libcurl4-openssl-dev libicu-dev logrotate \
-    python-docutils pkg-config cmake hostname
+    python-docutils pkg-config cmake hostname libkrb5-dev
 
 LABEL install git
-RUN apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev cmdtest npm
+RUN apt-get install -y libcurl4-openssl-dev libexpat1-dev gettext libz-dev cmdtest npm libpq-dev
 RUN wget \
     https://www.kernel.org/pub/software/scm/git/git-2.8.4.tar.gz
 RUN echo '626e319f8a24fc0866167ea5f6bf3e2f38f69d6cb2e59e150f13709ca3ebf301  git-2.8.4.tar.gz' \
@@ -28,7 +28,8 @@ RUN wget \
 RUN echo '1014ee699071aa2ddd501907d18cbe15399c997d  ruby-2.3.3.tar.gz' \
     | shasum -c - && tar xzf ruby-2.3.3.tar.gz
 RUN cd ruby-2.3.3 && ./configure --disable-install-rdoc && make && make install
-RUN gem install bundler --no-ri --no-rdoc
+RUN gem install bundler
+RUN gem install rdoc-data; rdoc-data --install
 
 LABEL install go
 RUN rm -rf /usr/local/go
@@ -47,15 +48,16 @@ RUN tar -C /usr/local -xf node-v8.12.0-linux-ppc64le.tar.xz
 RUN mv /usr/local/node-v8.12.0-linux-ppc64le /usr/local/node
 RUN ln -sf /usr/local/node/bin/node /usr/local/bin
 RUN ln -sf /usr/local/node/bin/npm /usr/local/bin
-RUN cd /usr/local/node/lib/node_modules
+RUN cd /usr/local/node/lib
 RUN npm install --global yarn
-RUN npm install webpack -g
+RUN npm install webpack@2.7.0
+RUN npm install pikaday
 RUN npm install date-fns
 RUN npm install heroku
-RUN ln -sf /usr/local/node/lib/node_modules/npm/package.json /usr/local/node/lib/package.json
 RUN ln -sf /usr/local/node/bin/yarn /usr/local/bin
 RUN ln -sf /usr/local/node/bin/yarnpkg /usr/local/bin
 RUN ln -sf /usr/local/node/bin/heroku /usr/local/bin
+RUN ln -sf /usr/local/node/lib/node_modules /node_modules
 RUN export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 RUN export PATH=/usr/local/node/bin:$PATH
 
@@ -84,6 +86,8 @@ RUN echo 'unixsocketperm 770' | tee -a /etc/redis/redis.conf
 RUN mkdir /var/run/redis -p
 RUN chown redis:redis /var/run/redis
 RUN chmod 755 /var/run/redis
+#RUN touch /var/run/redis/redis.sock
+#RUN chmod 777 /var/run/redis/redis.sock
 RUN mkdir /etc/tmpfiles.d -p && echo \
     'd  /var/run/redis  0755  redis  redis  10d  -' \
     | tee -a /etc/tmpfiles.d/redis.conf
@@ -94,6 +98,7 @@ LABEL install GitLab
 RUN cd /home/git && sudo -u git -H git clone \
     https://gitlab.com/gitlab-org/gitlab-ce.git -b 10-0-stable gitlab
 WORKDIR /home/git/gitlab
+RUN apt-get install -y gitlab-shell
 RUN sudo -u git -H cp config/gitlab.yml.example config/gitlab.yml
 RUN sed -e "s/\/usr\/bin\/git/\/usr\/local\/bin\/git/g" -i config/gitlab.yml
 RUN sudo -u git -H cp config/secrets.yml.example config/secrets.yml
@@ -141,8 +146,8 @@ RUN service postgresql start && service redis-server start && sleep 60 \
 RUN sudo -u git -H bundle exec rake gettext:pack RAILS_ENV=production
 RUN sudo -u git -H bundle exec rake gettext:po_to_json RAILS_ENV=production
 RUN sudo -u git -H yarn install --production --pure-lockfile
-#RUN sudo -u git -H bundle exec rake gitlab:assets:compile RAILS_ENV=production NODE_ENV=production
-RUN sudo -u git -H bundle exec rake gitlab:assets:clean gitlab:assets:compile cache:clear RAILS_ENV=production
+RUN sudo -u git -H bundle exec rake gitlab:assets:compile RAILS_ENV=production NODE_ENV=production
+#RUN sudo -u git -H bundle exec rake assets:clean assets:precompile cache:clear RAILS_ENV=production
 #RUN sudo -u git -H bundle exec rake cache:clear RAILS_ENV=production
 RUN service postgresql start && service redis-server start && sleep 60 \
     && service gitlab restart
@@ -161,8 +166,8 @@ LABEL fix before check
 RUN chmod -R ug+rwX,o-rwx /home/git/repositories
 RUN chmod -R ug-s /home/git/repositories
 RUN find /home/git/repositories -type d -print0 | xargs -0 chmod g+s
-RUN mkdir ~/gitlab-check-backup-1505496178
-RUN mv /home/git/.ssh/environment ~/gitlab-check-backup-1505496178
+RUN mkdir ~/gitlab-check-backup-ppc64le
+RUN mv /home/git/.ssh/environment ~/gitlab-check-backup-ppc64le
 
 LABEL check environment
 RUN service postgresql start && service redis-server start && sleep 60 \
