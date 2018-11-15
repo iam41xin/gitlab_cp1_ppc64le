@@ -146,9 +146,9 @@ RUN service postgresql start && service redis-server start && sleep 60 \
 RUN sudo -u git -H bundle exec rake gettext:pack RAILS_ENV=production
 RUN sudo -u git -H bundle exec rake gettext:po_to_json RAILS_ENV=production
 RUN sudo -u git -H yarn install --production --pure-lockfile
-RUN sudo -u git -H bundle exec rake gitlab:assets:compile RAILS_ENV=production NODE_ENV=production
+#RUN sudo -u git -H bundle exec rake gitlab:assets:compile RAILS_ENV=production NODE_ENV=production
 #RUN sudo -u git -H bundle exec rake assets:clean assets:precompile cache:clear RAILS_ENV=production
-#RUN sudo -u git -H bundle exec rake cache:clear RAILS_ENV=production
+RUN sudo -u git -H bundle exec rake cache:clear RAILS_ENV=production
 RUN service postgresql start && service redis-server start && sleep 60 \
     && service gitlab restart
 
